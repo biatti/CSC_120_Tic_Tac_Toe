@@ -110,10 +110,10 @@ class TicTacToeGame():
 
     def surrender(self, player):
         if player.user == self._p1.user:
-            print(f'p1 surrenders')
+            print(f'{player.user} surrenders')
             self.set_victor(self._p2)
         elif player.user == self._p2.user:
-            print(f'p2 surrenders')
+            print(f'{player.user} surrenders')
             self.set_victor(self._p1)
 
     def set_bonus(self):
@@ -190,8 +190,10 @@ class TicTacToeGame():
     def set_victor(self, winner):
         self.game_lock = True
         self._winner = winner
-        print(f'hi this is the winner {winner.user}')
         winner._wallet = winner._wallet + self._total_prize
+        print(f'Congratulations {winner.user}!!\n'
+              f'${self._total_prize} prize money has been added to your wallet')
+        self.stats_cleanup()
 
     def get_lock_status(self):
         return self.game_lock
@@ -216,3 +218,9 @@ class TicTacToeGame():
                f'[1] - Move\n' \
                f'[2] - Show Board\n' \
                f'[3] - Surrender\n'
+    def stats_cleanup(self):
+        if self.get_lock_status():
+            pass
+
+
+
