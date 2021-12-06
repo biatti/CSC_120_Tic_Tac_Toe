@@ -204,9 +204,12 @@ class TicTacToeGame():
             print(self.menu_info())
             option = input()
             if option == '1':
-                row = input('Input Row: ')
-                col = input('Input Col: ')
-                self.move(row, col)
+                try:
+                    row = input('Input Row: ')
+                    col = input('Input Col: ')
+                    self.move(row, col)
+                except (IndexError,ValueError) as err:
+                    print(f'Please use integers between 0-2 --->{err.args}')
             elif option == '2':
                 print(self.get_board())
             elif option == '3':
