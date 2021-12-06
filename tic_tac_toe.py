@@ -225,8 +225,13 @@ class TicTacToeGame():
                f'[2] - Show Board\n' \
                f'[3] - Surrender\n'
     def stats_cleanup(self):
-        if self.get_lock_status():
-            pass
+        if self.get_lock_status() and not isinstance(self._winner,str):
+            self._winner._wins = self._winner._wins + 1
+            if self._winner.user == self._p1.user:
+                    self._p2._loss = self._p2._loss + 1
+            elif self._winner.user == self._p2.user:
+                    self._p1._loss = self._p1._loss + 1
+
 
 
 
