@@ -7,6 +7,7 @@ class Player(object):
         self.user = user
         self._wins = 0
         self._loss = 0
+        self._draw = 0
         self._wallet = 1000
         self._wager = 0
 
@@ -39,6 +40,7 @@ class Player(object):
 class TicTacToeGame():
     game_lock = False
     ng_counter = 0
+
     def __init__(self, player1, player2):
 
         self._p1 = player1
@@ -88,42 +90,43 @@ class TicTacToeGame():
         :param row: row index 0-2
         :param col: col index 0-2
         """
-        row = int(row)
-        col = int(col)
+
         if not self.get_lock_status():
-            my_marker = self._markers[self._turn.user]
-            move_ok = False
 
-            if self._board.item(int(row), int(col)) == '-':
-                move_ok = True
-                self._board[row, col] = my_marker
-                self.check_victory()
-                self.check_draw()
-                self.change_turn()
-            else:
-                print('Bad Move - Board Occupied in that position')
+            row = int(row)
+            col = int(col)
+            if not self.get_lock_status():
+                my_marker = self._markers[self._turn.user]
+                move_ok = False
 
-
-
-
+                if self._board.item(int(row), int(col)) == '-':
+                    move_ok = True
+                    self._board[row, col] = my_marker
+                    self.check_victory()
+                    self.check_draw()
+                    self.change_turn()
+                else:
+                    print('Bad Move - Board Occupied in that position')
         else:
             print('Game is locked')
 
     def change_turn(self):
         """changes current turn to the opponent"""
-        if self._turn == self._p1:
-            self._turn = self._p2
-        elif self._turn == self._p2:
-            self._turn = self._p1
+        if not self.get_lock_status():
+            if self._turn == self._p1:
+                self._turn = self._p2
+            elif self._turn == self._p2:
+                self._turn = self._p1
 
     def surrender(self, player):
         """Forfeit the game and surrender prize money and waged to opponent"""
-        if player.user == self._p1.user:
-            print(f'{player.user} surrenders')
-            self.set_victor(self._p2)
-        elif player.user == self._p2.user:
-            print(f'{player.user} surrenders')
-            self.set_victor(self._p1)
+        if not self.get_lock_status():
+            if player.user == self._p1.user:
+                print(f'{player.user} surrenders')
+                self.set_victor(self._p2)
+            elif player.user == self._p2.user:
+                print(f'{player.user} surrenders')
+                self.set_victor(self._p1)
 
     def set_bonus(self):
         """A random bonus is allocated at the start of each match"""
@@ -135,59 +138,65 @@ class TicTacToeGame():
         Checks for victory conditions and sets victor if applicable
 
         """
-        x = np.char.count(self._board, 'X')
-        o = np.char.count(self._board, 'O')
+        if not self.get_lock_status():
 
-        win_conditions_x = {sum((x.item(0), x.item(1), x.item(2))) == 3: self._p1,
-                            sum((x.item(3), x.item(4), x.item(5))) == 3: self._p1,
-                            sum((x.item(6), x.item(7), x.item(8))) == 3: self._p1,
-                            sum((x.item(0), x.item(3), x.item(6))) == 3: self._p1,
-                            sum((x.item(1), x.item(4), x.item(7))) == 3: self._p1,
-                            sum((x.item(2), x.item(5), x.item(8))) == 3: self._p1,
-                            sum((x.item(0), x.item(4), x.item(8))) == 3: self._p1,
-                            sum((x.item(2), x.item(4), x.item(6))) == 3: self._p1,
-                            }
+            x = np.char.count(self._board, 'X')
+            o = np.char.count(self._board, 'O')
 
-        win_conditions_o = {sum((o.item(0), o.item(1), o.item(2))) == 3: self._p2,
-                            sum((o.item(3), o.item(4), o.item(5))) == 3: self._p2,
-                            sum((o.item(6), o.item(7), o.item(8))) == 3: self._p2,
-                            sum((o.item(0), o.item(3), o.item(6))) == 3: self._p2,
-                            sum((o.item(1), o.item(4), o.item(7))) == 3: self._p2,
-                            sum((o.item(2), o.item(5), o.item(8))) == 3: self._p2,
-                            sum((o.item(0), o.item(4), o.item(8))) == 3: self._p2,
-                            sum((o.item(2), o.item(4), o.item(6))) == 3: self._p2,
+            win_conditions_x = {sum((x.item(0), x.item(1), x.item(2))) == 3: self._p1,
+                                sum((x.item(3), x.item(4), x.item(5))) == 3: self._p1,
+                                sum((x.item(6), x.item(7), x.item(8))) == 3: self._p1,
+                                sum((x.item(0), x.item(3), x.item(6))) == 3: self._p1,
+                                sum((x.item(1), x.item(4), x.item(7))) == 3: self._p1,
+                                sum((x.item(2), x.item(5), x.item(8))) == 3: self._p1,
+                                sum((x.item(0), x.item(4), x.item(8))) == 3: self._p1,
+                                sum((x.item(2), x.item(4), x.item(6))) == 3: self._p1,
+                                }
 
-                            }
+            win_conditions_o = {sum((o.item(0), o.item(1), o.item(2))) == 3: self._p2,
+                                sum((o.item(3), o.item(4), o.item(5))) == 3: self._p2,
+                                sum((o.item(6), o.item(7), o.item(8))) == 3: self._p2,
+                                sum((o.item(0), o.item(3), o.item(6))) == 3: self._p2,
+                                sum((o.item(1), o.item(4), o.item(7))) == 3: self._p2,
+                                sum((o.item(2), o.item(5), o.item(8))) == 3: self._p2,
+                                sum((o.item(0), o.item(4), o.item(8))) == 3: self._p2,
+                                sum((o.item(2), o.item(4), o.item(6))) == 3: self._p2,
 
-        winner_x = win_conditions_x.get(True,False)
-        winner_o = win_conditions_o.get(True,False)
+                                }
 
-        if winner_x and winner_o != False:
-            raise ValueError(f'Cannot have two winners')
-        elif winner_x != False:
-            self.set_victor(winner_x)
-        elif winner_o !=False:
-            self.set_victor(winner_o)
+            winner_x = win_conditions_x.get(True, False)
+            winner_o = win_conditions_o.get(True, False)
 
+            if winner_x and winner_o != False:
+                raise ValueError(f'Cannot have two winners')
+            elif winner_x != False:
+                self.set_victor(winner_x)
+            elif winner_o != False:
+                self.set_victor(winner_o)
 
     def check_draw(self):
-        count = (self._board == '-').sum()
-        if count == 0:
-            self.game_lock = True
-            self._winner = 'DRAW'
-            self._p1._wallet = self._p1._wallet + (self._total_prize / 2)
-            self._p2._wallet = self._p2._wallet + (self._total_prize / 2)
+        """Checks that all positions have been filled, announces a draw and returns 25% of prize money"""
+        if not self.game_lock:
+            count = (self._board == '-').sum()
+            if count == 0:
+                self._winner = 'DRAW'
+                self._p1._wallet = self._p1._wallet + ((self._total_prize / 2) * 0.25)
+                self._p2._wallet = self._p2._wallet + ((self._total_prize / 2 )* 0.25)
+                print('Game has ended in a draw. Players have been paid 25% of prize money')
+                self.game_lock = True
+
 
     def get_board(self):
         return self._board
 
     def set_victor(self, winner):
-        self.game_lock = True
-        self._winner = winner
-        winner._wallet = winner._wallet + self._total_prize
-        print(f'Congratulations {winner.user}!!\n'
-              f'${self._total_prize} prize money has been added to your wallet')
-        self.stats_cleanup()
+        if not self.get_lock_status():
+            self._winner = winner
+            winner._wallet = winner._wallet + self._total_prize
+            print(f'Congratulations {winner.user}!!\n'
+                  f'${self._total_prize} prize money has been added to your wallet')
+            self.stats_cleanup()
+            self.game_lock = True
 
     def get_lock_status(self):
         """returns game lock status.
@@ -208,7 +217,7 @@ class TicTacToeGame():
                     row = input('Input Row: ')
                     col = input('Input Col: ')
                     self.move(row, col)
-                except (IndexError,ValueError) as err:
+                except (IndexError, ValueError) as err:
                     print(f'Please use integers between 0-2 --->{err.args}')
             elif option == '2':
                 print(self.get_board())
@@ -216,22 +225,21 @@ class TicTacToeGame():
                 self.surrender(self._turn)
 
     def menu_info(self):
-        if self.ng_counter == 0:
-            print(self.game_intro())
-            self.ng_counter = self.ng_counter + 1
-        return f'Player Turn: {self._turn.user} \n' \
-               f'Please make a selection:\n\n' \
-               f'[1] - Move\n' \
-               f'[2] - Show Board\n' \
-               f'[3] - Surrender\n'
+        if not self.get_lock_status():
+            if self.ng_counter == 0:
+                print(self.game_intro())
+                self.ng_counter = self.ng_counter + 1
+            return f'Player Turn: {self._turn.user} \n' \
+                   f'Please make a selection:\n\n' \
+                   f'[1] - Move\n' \
+                   f'[2] - Show Board\n' \
+                   f'[3] - Surrender\n'
+
     def stats_cleanup(self):
-        if self.get_lock_status() and not isinstance(self._winner,str):
-            self._winner._wins = self._winner._wins + 1
-            if self._winner.user == self._p1.user:
+        if not self.get_lock_status():
+            if self.get_lock_status() and not isinstance(self._winner, str):
+                self._winner._wins = self._winner._wins + 1
+                if self._winner.user == self._p1.user:
                     self._p2._loss = self._p2._loss + 1
-            elif self._winner.user == self._p2.user:
+                elif self._winner.user == self._p2.user:
                     self._p1._loss = self._p1._loss + 1
-
-
-
-
