@@ -6,9 +6,10 @@ import random
 def main():
     a = Player('Biatti')
     b = Player('Mary')
-
     Game1 = TicTacToeGame(a,b)
-    print(Game1.game_intro())
+
+    Game1.menu_option()
+
 
 
 
