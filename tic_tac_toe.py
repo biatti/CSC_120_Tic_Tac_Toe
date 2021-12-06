@@ -38,7 +38,7 @@ class Player(object):
 
 class TicTacToeGame():
     game_lock = False
-
+    ng_counter = 0
     def __init__(self, player1, player2):
 
         self._p1 = player1
@@ -81,6 +81,13 @@ class TicTacToeGame():
             raise ValueError
 
     def move(self, row, col):
+        """
+        Moves player marker, checks for valid positions
+        and winning criteria.
+
+        :param row: row index 0-2
+        :param col: col index 0-2
+        """
         row = int(row)
         col = int(col)
         if not self.get_lock_status():
@@ -103,12 +110,14 @@ class TicTacToeGame():
             print('Game is locked')
 
     def change_turn(self):
+        """changes current turn to the opponent"""
         if self._turn == self._p1:
             self._turn = self._p2
         elif self._turn == self._p2:
             self._turn = self._p1
 
     def surrender(self, player):
+        """Forfeit the game and surrender prize money and waged to opponent"""
         if player.user == self._p1.user:
             print(f'{player.user} surrenders')
             self.set_victor(self._p2)
@@ -117,10 +126,15 @@ class TicTacToeGame():
             self.set_victor(self._p1)
 
     def set_bonus(self):
+        """A random bonus is allocated at the start of each match"""
         bonus = random.randint(100, 5000)
         return bonus
 
     def check_victory(self):
+        """
+        Checks for victory conditions and sets victor if applicable
+
+        """
         x = np.char.count(self._board, 'X')
         o = np.char.count(self._board, 'O')
 
@@ -144,23 +158,7 @@ class TicTacToeGame():
                             sum((o.item(2), o.item(4), o.item(6))) == 3: self._p2,
 
                             }
-        # win_conditions = {self._board[0:3].count('X') == 3: self._p1,
-        #                   self._board[3:6].count('X') == 3: self._p1,
-        #                   self._board[6:9].count('X') == 3: self._p1,
-        #                   self._board[0:7, 3].count('X') == 3: self._p1,
-        #                   self._board[1:8, 3].count('X') == 3: self._p1,
-        #                   self._board[2:9, 3].count('X') == 3: self._p1,
-        #                   self._board[0:9, 4].count('X') == 3: self._p1,
-        #                   self._board[2:8, 2].count('X') == 3: self._p1,
-        #                   self._board[0:3].count('O') == 3: self._p1,
-        #                   self._board[3:6].count('O') == 3: self._p1,
-        #                   self._board[6:9].count('O') == 3: self._p1,
-        #                   self._board[0:7, 3].count('O') == 3: self._p1,
-        #                   self._board[1:8, 3].count('O') == 3: self._p1,
-        #                   self._board[2:9, 3].count('O') == 3: self._p1,
-        #                   self._board[0:9, 4].count('O') == 3: self._p1,
-        #                   self._board[2:8, 2].count('O') == 3: self._p1,
-        #                   }
+
         winner_x = win_conditions_x.get(True,False)
         winner_o = win_conditions_o.get(True,False)
 
@@ -172,17 +170,13 @@ class TicTacToeGame():
             self.set_victor(winner_o)
 
 
-        #winner = win_conditions.get(True, False)
-        #if not winner:
-            #self.set_victor(winner)
-
     def check_draw(self):
         count = (self._board == '-').sum()
         if count == 0:
             self.game_lock = True
             self._winner = 'DRAW'
-            self._p1.wallet = self._p1.wallet[self._total_prize / 2]
-            self._p2.wallet = self._p2.wallet[self._total_prize / 2]
+            self._p1._wallet = self._p1._wallet + (self._total_prize / 2)
+            self._p2._wallet = self._p2._wallet + (self._total_prize / 2)
 
     def get_board(self):
         return self._board
@@ -196,9 +190,15 @@ class TicTacToeGame():
         self.stats_cleanup()
 
     def get_lock_status(self):
+        """returns game lock status.
+            Locked games are games that ended and should not be modified further
+        """
         return self.game_lock
 
     def menu_option(self):
+        """
+        presents user menu options
+        """
         option = 0
         while not self.game_lock:
             print(self.menu_info())
@@ -213,6 +213,9 @@ class TicTacToeGame():
                 self.surrender(self._turn)
 
     def menu_info(self):
+        if self.ng_counter == 0:
+            print(self.game_intro())
+            self.ng_counter = self.ng_counter + 1
         return f'Player Turn: {self._turn.user} \n' \
                f'Please make a selection:\n\n' \
                f'[1] - Move\n' \
